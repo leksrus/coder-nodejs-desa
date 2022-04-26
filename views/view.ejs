@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Product view</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+        integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container mt-3">
+            <div class="jumbotron">
+                <h1>Products view</h1>
+                <br>
+
+                <% if(productsViewExist){ %>
+                    <div class="table-responsive">
+                        <table class="table table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Thumbnails</th>
+                            </tr>
+                            <%productsView.forEach(function(product) {%>
+                                <tr>
+                                    <td>
+                                        <%=product.title%>
+                                    </td>
+                                    <td>
+                                        <%=product.price%>
+                                    </td>
+                                    <td><img width="50" src=<%=product.thumbnail%> alt="not found"></td>
+                                </tr>
+                                <%});%>
+                        </table>
+                    </div>
+                    <% } else{ %>
+                        <h3 class="alert alert-danger">Products not found</h3>
+                        <% } %>
+
+                            <br>
+                            <a href="/" type="button" class="btn btn-primary">To -> save new products</a>
+
+            </div>
+    </div>
+
+
+</body>
+
+</html>

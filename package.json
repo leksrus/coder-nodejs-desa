@@ -1,0 +1,26 @@
+{
+  "name": "desafio",
+  "version": "1.0.0",
+  "description": "desafios",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leksrus/coder-nodejs-desa.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leksrus/coder-nodejs-desa/issues"
+  },
+  "homepage": "https://github.com/leksrus/coder-nodejs-desa#readme",
+  "dependencies": {
+    "express": "^4.18.0",
+    "express-handlebars": "^6.0.5",
+    "socket.io": "^4.5.0"
+  }
+}
