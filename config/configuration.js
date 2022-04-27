@@ -15,10 +15,7 @@ export const mySqlDatabase = knex({
 export const sqlLite3Database = knex({
   client: 'sqlite3',
   connection: {
-    host : 'localhost',
-    user : '',
-    password : 'your_database_password',
-    database : 'myapp_test'
+    filename: "./db/chats.sqlite"
   }
 });
 

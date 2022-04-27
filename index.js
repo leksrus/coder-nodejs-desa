@@ -5,9 +5,8 @@ import Message from "./classes/message.js";
 import Container from "./classes/container.js"
 import { Server } from 'socket.io';
 import { engine } from 'express-handlebars';
-import {createProductTable, KnexConfiguration} from './utils.js';
-import {mySqlDatabase} from './config/configuration.js';
-import { privateDecrypt } from 'crypto';
+import {createProductsTable, createMessagesTable, KnexConfiguration} from './utils.js';
+import {mySqlDatabase, sqlLite3Database} from './config/configuration.js';
 
 
 
@@ -41,19 +40,26 @@ app.set('view engine', 'hbs');
 
 const port = 8080;
 
-createProductTable();
+createProductsTable();
+createMessagesTable();
 const productsDbUtils = new KnexConfiguration(mySqlDatabase, 'products');
+const messagesDbUtils = new KnexConfiguration(sqlLite3Database, 'messages');
 
-let messages = [];
+let mess = [];
 let prods = [];
 
 
 //WEBSOCKET
 io.on('connection', function(socket) {
   console.log('client conected');
-  socket.emit('messages', messages); 
+
+  messagesDbUtils.getAll().then((messages)=>{
+    mess = messages;
+    socket.emit('messages', mess);
+  }).catch(error => console.log(error));
+
   productsDbUtils.getAll().then((products)=> {
-    prods.push(...products);
+    prods = products;
     socket.emit('products', prods); 
   }).catch(error => console.log(error));
 
@@ -65,9 +71,10 @@ io.on('connection', function(socket) {
   });    
 
   socket.on('new-message', function(data) {
-    messages.push(data);
-    container.save(new Message(data.email, data.dateTime, data.text))
-    io.sockets.emit('messages', messages); 
+    const message = new Message(data.email, data.dateTime, data.text)
+    messagesDbUtils.insertData(message).then(()=>{
+      io.sockets.emit('messages', mess);
+    }).catch(error => console.log(error));
   }); 
 });
 

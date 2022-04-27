@@ -1,4 +1,4 @@
-import {mySqlDatabase} from './config/configuration.js';
+import {mySqlDatabase, sqlLite3Database} from './config/configuration.js';
 
 
 
@@ -66,8 +66,7 @@ export class KnexConfiguration {
   }
 }
 
-export const createProductTable = () => {
-
+export const createProductsTable = () => {
   mySqlDatabase.schema.hasTable('products').then((exist)=>{
     if(!exist) {
       mySqlDatabase.schema.createTableIfNotExists('products', function (table) {
@@ -75,14 +74,25 @@ export const createProductTable = () => {
       table.string('title');
       table.decimal('price');
       table.string('thumbnails');
-      }).then(()=> console.log("Tabla created"))
+      }).then(()=> console.log("Table products created"))
       .catch(error => console.log(error));
     }
   }).catch(error => console.log(error));
+};
 
-  
-  
+export const createMessagesTable = () => {
+  sqlLite3Database.schema.hasTable('messages').then((exist)=>{
+    if(!exist) {
+      sqlLite3Database.schema.createTableIfNotExists('messages', function (table) {
+        table.increments();
+        table.string('email');
+        table.datetime('dateTime');
+        table.string('text');
+      }).then(()=> console.log("Table messages created"))
+          .catch(error => console.log(error));
+    }
+  }).catch(error => console.log(error));
 };
 
   
-export default { createProductTable, KnexConfiguration };
+export default { createProductsTable, createMessagesTable, KnexConfiguration };
