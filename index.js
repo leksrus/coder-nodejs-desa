@@ -5,6 +5,9 @@ import Message from "./classes/message.js";
 import Container from "./classes/container.js"
 import { Server } from 'socket.io';
 import { engine } from 'express-handlebars';
+import {createProductsTable, createMessagesTable, KnexConfiguration} from './utils.js';
+import {mySqlDatabase, sqlLite3Database} from './config/configuration.js';
+
 
 
 // const tempContainer = new Container("products.txt");
@@ -37,25 +40,41 @@ app.set('view engine', 'hbs');
 
 const port = 8080;
 
-let products = [];
-let messages = [];
+createProductsTable();
+createMessagesTable();
+const productsDbUtils = new KnexConfiguration(mySqlDatabase, 'products');
+const messagesDbUtils = new KnexConfiguration(sqlLite3Database, 'messages');
+
+let mess = [];
+let prods = [];
 
 
 //WEBSOCKET
 io.on('connection', function(socket) {
   console.log('client conected');
-  socket.emit('products', products); 
-  socket.emit('messages', messages); 
+
+  messagesDbUtils.getAll().then((messages)=>{
+    mess = messages;
+    socket.emit('messages', mess);
+  }).catch(error => console.log(error));
+
+  productsDbUtils.getAll().then((products)=> {
+    prods = products;
+    socket.emit('products', prods); 
+  }).catch(error => console.log(error));
 
   socket.on('new-product', function(data) {
-    products.push(data);
-    io.sockets.emit('products', products); 
+    const product = new Product(undefined, data.title, data.price, data.thumbnails);
+    productsDbUtils.insertData(product).then(() => {
+       io.sockets.emit('products', prods); 
+    }).catch(error => console.log(error));
   });    
 
   socket.on('new-message', function(data) {
-    messages.push(data);
-    container.save(new Message(data.email, data.dateTime, data.text))
-    io.sockets.emit('messages', messages); 
+    const message = new Message(data.email, data.dateTime, data.text)
+    messagesDbUtils.insertData(message).then(()=>{
+      io.sockets.emit('messages', mess);
+    }).catch(error => console.log(error));
   }); 
 });
 
@@ -64,6 +83,7 @@ io.on('connection', function(socket) {
 
 //TEMPLATES
 app.get('/products', (req, res) => {
+
   res.render("view");
 });
 
