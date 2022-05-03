@@ -1,0 +1,13 @@
+//Hacer una actualización sobre todos los productos, agregando el campo stock a todos ellos con un valor de 100.
+use('ecommerce')
+
+try {
+
+    db.products.updateMany({},
+                {$set:{"stock": 100}})
+
+
+
+} catch (e) {
+   console.log (e);
+}

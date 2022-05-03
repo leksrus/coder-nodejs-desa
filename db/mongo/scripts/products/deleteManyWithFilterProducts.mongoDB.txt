@@ -1,0 +1,12 @@
+// Borrar los productos con precio menor a 1000 pesos
+use('ecommerce')
+
+let varPrice = 1000
+
+try {
+   db.products.deleteMany(
+      { price: { $lte: varPrice } }
+   );
+} catch (e) {
+   print(e);
+}

@@ -1,0 +1,16 @@
+// Realizar una consulta que traiga sólo el nombre del tercer producto más barato.
+
+use('ecommerce')
+
+try {
+
+    db.products
+        .find( {}, {"title": 1,  _id: 0} )
+            .sort( { price: 1 } )
+            .limit( 1 )
+            .skip( 2 )
+
+
+} catch (e) {
+   print (e);
+}

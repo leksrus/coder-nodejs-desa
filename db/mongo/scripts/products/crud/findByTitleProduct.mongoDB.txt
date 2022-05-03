@@ -1,0 +1,13 @@
+use('ecommerce')
+
+let varTitle = 'Memory RAM'
+
+try {
+   db.products.find(
+       {
+          title: varTitle
+       }
+ );
+} catch (e) {
+   print (e);
+}
