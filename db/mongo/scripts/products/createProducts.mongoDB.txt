@@ -1,0 +1,60 @@
+
+use('ecommerce')
+
+
+try {
+   db.products.insertMany( [
+    {
+        title: 'Memory RAM',
+        price: 120,
+        thumbnails: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.ubuy.com.tr%2Fen%2Fproduct%2FQHELMM-corsair-vengeance-rgb-pro-32gb-2x16gb-ddr4-3600-pc4-28800-c18-amd-optimized-memory-black&psig=AOvVaw1LBlQ82I67zj9QMGPn3Oki&ust=1651695915262000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCIDAyfSUxPcCFQAAAAAdAAAAABAO'
+    },
+    {
+        title: 'CPU I3',
+        price: 580,
+        thumbnails: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.ldlc.com%2Fes-es%2Fficha%2FPB00384191.html&psig=AOvVaw1uEW3grQOqjPFNO0j2gWuf&ust=1651696264063000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCPCojJuWxPcCFQAAAAAdAAAAABAH'
+    },
+    {
+        title: 'Keyboard MK1 Red Led',
+        price: 900,
+        thumbnails: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.amazon.com%2FMechanical-Gaming-Keyboard-Keyboards-Equivalent%2Fdp%2FB07RWDRGH4&psig=AOvVaw3v7ZKECkR34FOlSWF_eMXZ&ust=1651696160520000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCPiOjuqVxPcCFQAAAAAdAAAAABAE'
+    },
+    {
+        title: 'SSD Samsung Pro',
+        price: 1280,
+        thumbnails: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.adslzone.net%2Freportajes%2Ftecnologia%2Fque-es-ssd-caracteristicas%2F&psig=AOvVaw2iM-1Tsp5VJhKbhvDsxB9k&ust=1651696119505000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCPjvgNaVxPcCFQAAAAAdAAAAABAI'
+    },
+    {
+        title: 'PSU Corsair',
+        price: 1700,
+        thumbnails: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.kitguru.net%2Fcomponents%2Fpower-supplies%2Faris-bitziopoulos%2Fcorsair-rm850x-2018-psu-review%2F2%2F&psig=AOvVaw2IvgoviET5zrTgDHqU1wtK&ust=1651696087834000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCND46caVxPcCFQAAAAAdAAAAABAH'
+    },
+    {
+        title: 'CPU I9',
+        price: 2300,
+        thumbnails: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fquietpc.dk%2Fintel-9th-gen-core%3Fproduct%3D5583&psig=AOvVaw2Xytm-nQoStjZ_PFvQsmne&ust=1651696292011000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCIiRkamWxPcCFQAAAAAdAAAAABAD'
+    },
+    {
+        title: 'CPU I9',
+        price: 2860,
+        thumbnails: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.geeknetic.es%2FEditorial%2F1774%2FIntel-Core-10a-Generacion-Comet-Lake-S-para-sobremesa-Todo-lo-que-necesitas-saber.html&psig=AOvVaw2Xytm-nQoStjZ_PFvQsmne&ust=1651696292011000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCIjNseuWxPcCFQAAAAAdAAAAABAO'
+    },
+    {
+        title: 'ATI HD 5970',
+        price: 3350,
+        thumbnails: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Factualizar-android.com%2Frevision-de-la-potencia-de-ati-radeon-hd-5970-dual-gpu%2F&psig=AOvVaw08iE3vHXkrQUXn2rOmhf2z&ust=1651696476619000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCMiHnoCXxPcCFQAAAAAdAAAAABAF'
+    },
+    {
+        title: 'RYZEN 9',
+        price: 4320,
+        thumbnails: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.newegg.com%2Famd-ryzen-9-3900x%2Fp%2FN82E16819113103&psig=AOvVaw27EcRprf56n19Dk3QbZGlJ&ust=1651696518624000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCNjD5ZSXxPcCFQAAAAAdAAAAABAD'
+    },
+    {
+        title: 'GPU RTX 3090',
+        price: 4990,
+        thumbnails: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.dreamstime.com%2Fevga-geforce-rtx-nvidia-gpu-box-desk-budapest-hungary-circa-nvidia-geforce-rtx-graphics-card-made-evga-its-box-high-end-image236894710&psig=AOvVaw2SN14ze7y_1ik61jMh_exn&ust=1651696025604000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCMiLh6mVxPcCFQAAAAAdAAAAABAG'
+    }
+   ] );
+} catch (e) {
+   print (e);
+}

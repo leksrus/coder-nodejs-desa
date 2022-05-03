@@ -1,0 +1,12 @@
+use('ecommerce')
+
+try {
+   db.products.insertOne(
+    {
+        title: 'Monitor Asus',
+        price: 180,
+        thumbnails: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.mexx.com.ar%2Fproductos-rubro%2Fmonitores%2F42072-monitor-led-24-asus-full-hd-ips-144hz-vp249qgr.html&psig=AOvVaw1ftASVZLN7MCe6ZmDbSLHc&ust=1651696872860000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCOD3sL2YxPcCFQAAAAAdAAAAABAE'
+    } );
+} catch (e) {
+   print (e);
+}

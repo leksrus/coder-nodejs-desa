@@ -1,0 +1,13 @@
+// Cambiar el stock a cero de los productos con precios mayores a 4000 pesos
+use('ecommerce')
+
+let varPrice = 4000
+
+try {
+   db.products.updateMany(
+      { price: { $gte: varPrice } },
+      { $set: { "stock" : 0 } }
+   );
+} catch (e) {
+   print(e);
+}

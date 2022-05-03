@@ -1,0 +1,13 @@
+use('ecommerce')
+
+let varPrice = 1000
+
+try {
+   db.products.find(
+       {
+          price: { $lte : varPrice}
+       }
+ );
+} catch (e) {
+   print (e);
+}

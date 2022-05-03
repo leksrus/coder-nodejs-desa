@@ -1,0 +1,17 @@
+
+use('ecommerce')
+
+let varPriceMin = 1000
+let varPriceMax = 3000
+
+try {
+   db.products.find(
+       {
+          $and:[  {price:{$gte:varPriceMin}} ,
+                  {price:{$lte:varPriceMax}}
+               ]
+       }
+ );
+} catch (e) {
+   print (e);
+}
