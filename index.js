@@ -13,7 +13,7 @@ faker.locale = 'es';
 
 
 
-// const tempContainer = new Container("products.txt");
+// const tempContainer = new Container("messages.txt");
 // const random = require('random');
 const app = express();
 const { Router } = express;
@@ -23,7 +23,7 @@ const io = new Server(httpServer);
 const container = new Container('messages.txt');
 
 app.use('/api/products', routerProducts);
-app.use('/api/public', express.static('public'))
+app.use( express.static('public'))
 
 routerProducts.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -76,11 +76,11 @@ io.on('connection', function(socket) {
 
   socket.on('new-message', function(data) {
     const message = new Message(data.text, data.author);
-    mess.push(message);
-    const info = JSON.stringify(mess);
-    console.log(JSON.parse(info));
-    console.log(normalizeData(JSON.parse(info)));
-    io.sockets.emit('messages', normalizeData(JSON.parse(info)));
+    container.saveNew(message).then(()=>{
+      container.getAll().then(info => {
+        io.sockets.emit('messages', normalizeData(info));
+      })
+    });
     // messagesDbUtils.insertData(message).then(()=>{
     //   io.sockets.emit('messages', mess);
     // }).catch(error => console.log(error));
@@ -107,7 +107,7 @@ app.post('/products', (req, res) => {
 
 
 //FAKE
-app.get('/api/products-test', (req, res) => {
+app.get('/products-test', (req, res) => {
   const products = createFakesProducts(CANT_PRODUCTS_DEFAULT);
 
   res.render("view", {products: products});
@@ -192,17 +192,16 @@ function getId(products) {
 
 //NORMALIZER
 
-const authorSchema = new schema.Entity('author', {}, {idAttribute: 'email'});
-const messageSchema = new schema.Entity('message', {
+const authorSchema = new schema.Entity('authors', {}, {idAttribute: 'email'});
+const messageSchema = new schema.Entity('messages', {
   author: authorSchema
 });
 
-const messageListSchema = new schema.Array(
-    {
-      messages: [messageSchema],
-      id: 'messages'
-    }
-);
+const messagesSchema = new schema.Entity('articles', {
+  author: user,
+  comments: [comment],
+});
+
 
 function normalizeData(data){
   return normalize(data, messageSchema);
