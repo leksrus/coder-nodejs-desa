@@ -8,6 +8,7 @@ import { engine } from 'express-handlebars';
 import {createProductsTable, createMessagesTable, KnexConfiguration} from './utils.js';
 import {mySqlDatabase, sqlLite3Database} from './config/configuration.js';
 import { faker } from '@faker-js/faker';
+import {normalize, denormalize, schema} from 'normalizr';
 faker.locale = 'es';
 
 
@@ -22,7 +23,7 @@ const io = new Server(httpServer);
 const container = new Container('messages.txt');
 
 app.use('/api/products', routerProducts);
-app.use(express.static('public'))
+app.use('/api/public', express.static('public'))
 
 routerProducts.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -42,10 +43,10 @@ app.set('view engine', 'hbs');
 
 const port = 8080;
 
-createProductsTable();
-createMessagesTable();
-const productsDbUtils = new KnexConfiguration(mySqlDatabase, 'products');
-const messagesDbUtils = new KnexConfiguration(sqlLite3Database, 'messages');
+// createProductsTable();
+// createMessagesTable();
+// const productsDbUtils = new KnexConfiguration(mySqlDatabase, 'products');
+// const messagesDbUtils = new KnexConfiguration(sqlLite3Database, 'messages');
 
 let mess = [];
 let prods = [];
@@ -54,29 +55,35 @@ let prods = [];
 //WEBSOCKET
 io.on('connection', function(socket) {
   console.log('client conected');
-
-  messagesDbUtils.getAll().then((messages)=>{
-    mess = messages;
-    socket.emit('messages', mess);
-  }).catch(error => console.log(error));
-
-  productsDbUtils.getAll().then((products)=> {
-    prods = products;
-    socket.emit('products', prods); 
-  }).catch(error => console.log(error));
+  socket.emit('messages', mess);
+  // messagesDbUtils.getAll().then((messages)=>{
+  //   mess = messages;
+  //   socket.emit('messages', mess);
+  // }).catch(error => console.log(error));
+  socket.emit('products', prods);
+  // productsDbUtils.getAll().then((products)=> {
+  //   prods = products;
+  //
+  // }).catch(error => console.log(error));
 
   socket.on('new-product', function(data) {
     const product = new Product(undefined, data.title, data.price, data.thumbnails);
-    productsDbUtils.insertData(product).then(() => {
-       io.sockets.emit('products', prods); 
-    }).catch(error => console.log(error));
+    io.sockets.emit('products', prods);
+    // productsDbUtils.insertData(product).then(() => {
+    //    io.sockets.emit('products', prods);
+    // }).catch(error => console.log(error));
   });    
 
   socket.on('new-message', function(data) {
-    const message = new Message(data.email, data.dateTime, data.text)
-    messagesDbUtils.insertData(message).then(()=>{
-      io.sockets.emit('messages', mess);
-    }).catch(error => console.log(error));
+    const message = new Message(data.text, data.author);
+    mess.push(message);
+    const info = JSON.stringify(mess);
+    console.log(JSON.parse(info));
+    console.log(normalizeData(JSON.parse(info)));
+    io.sockets.emit('messages', normalizeData(JSON.parse(info)));
+    // messagesDbUtils.insertData(message).then(()=>{
+    //   io.sockets.emit('messages', mess);
+    // }).catch(error => console.log(error));
   }); 
 });
 
@@ -180,6 +187,25 @@ function getId(products) {
   const ids = products.map((product) => product.id);
 
   return ids.length > 0 ? Math.max(...ids) : 1;
+}
+
+
+//NORMALIZER
+
+const authorSchema = new schema.Entity('author', {}, {idAttribute: 'email'});
+const messageSchema = new schema.Entity('message', {
+  author: authorSchema
+});
+
+const messageListSchema = new schema.Array(
+    {
+      messages: [messageSchema],
+      id: 'messages'
+    }
+);
+
+function normalizeData(data){
+  return normalize(data, messageSchema);
 }
 
 httpServer.listen(port, () => {

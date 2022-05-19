@@ -45,21 +45,31 @@ function addProduct() {
 
 
 function renderMessages(data) { 
-    let html = data.map(function(elem, index){ 
-      return(`<div>
-            <span class="text-primary"><strong>${elem.email}</strong></span>: 
-            <span class="text-muted">${elem.dateTime}</span>
-            <span class="text-success"><em>${elem.text}</em></span>
-            </div>`)
-    }).join(" "); 
-    document.getElementById('messages').innerHTML = html; 
+    // let html = data.map(function(elem, index){
+    //   return(`<div>
+    //         <span class="text-primary"><strong>${elem.text}</strong></span>:
+    //         <span class="text-muted">${elem.author.id}</span>
+    //         <span class="text-success"><em>${elem.author.name}</em></span>
+    //         <span class="text-success"><em>${elem.author.lastname}</em></span>
+    //         <span class="text-success"><em>${elem.author.age}</em></span>
+    //         <span class="text-success"><em>${elem.author.alias}</em></span>
+    //         <span class="text-success"><em>${elem.author.avatar}</em></span>
+    //         </div>`)
+    // }).join(" ");
+    // document.getElementById('messages').innerHTML = html;
 }
 
 function addMessage() { 
-    let message = { 
-      email: document.getElementById('email').value,
-      dateTime: getDateStamp(),
-      text: document.getElementById('message').value
+    let message = {
+      text: document.getElementById('message').value,
+        author: {
+            email: document.getElementById('email').value,
+            name: 'test',
+            lastname: 'test',
+            age: 22,
+            alias: 'testing',
+            avatar: 'avatar'
+        }
     }; 
     console.log(message);
     socket.emit('new-message', message); 
