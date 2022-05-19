@@ -7,6 +7,8 @@ import { Server } from 'socket.io';
 import { engine } from 'express-handlebars';
 import {createProductsTable, createMessagesTable, KnexConfiguration} from './utils.js';
 import {mySqlDatabase, sqlLite3Database} from './config/configuration.js';
+import { faker } from '@faker-js/faker';
+faker.locale = 'es';
 
 
 
@@ -97,6 +99,27 @@ app.post('/products', (req, res) => {
 });
 
 
+//FAKE
+app.get('/api/products-test', (req, res) => {
+  const products = createFakesProducts(CANT_PRODUCTS_DEFAULT);
+
+  res.render("view", {products: products});
+});
+
+const CANT_PRODUCTS_DEFAULT = 5;
+
+function createFakeProduct(id) {
+  return new Product(id, faker.commerce.productName(), faker.finance.amount(), faker.image.image());
+}
+
+function createFakesProducts(cant) {
+  const products = []
+  for (let i = 0; i < cant; i++) {
+    products.push(createFakeProduct(getId(products)))
+  }
+  return products
+}
+
 
 //API REST
 routerProducts.get('/', async (req, res) => {
@@ -141,22 +164,22 @@ routerProducts.put('/:id', async (req, res) => {
   return res.json(newProduct);
 })
 
-routerProducts.delete('/:id', async (req, res) => {
-  const product = products.find(x => x.id === parseInt(req.params.id));
+// routerProducts.delete('/:id', async (req, res) => {
+//   const product = products.find(x => x.id === parseInt(req.params.id));
+//
+//   if(product) {
+//     products = products.filter(x => x.id !== product.id);
+//
+//     return res.json(product);
+//   }
+//
+//   return res.json({error: "404 product not found for delete"});
+// })
 
-  if(product) {
-    products = products.filter(x => x.id !== product.id);
-
-    return res.json(product);
-  }
-
-  return res.json({error: "404 product not found for delete"});
-})
-
-function getId() {
+function getId(products) {
   const ids = products.map((product) => product.id);
 
-  return ids.length > 0 ? Math.max(...ids) : 0;
+  return ids.length > 0 ? Math.max(...ids) : 1;
 }
 
 httpServer.listen(port, () => {
