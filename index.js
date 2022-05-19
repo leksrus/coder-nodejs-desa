@@ -7,10 +7,13 @@ import { Server } from 'socket.io';
 import { engine } from 'express-handlebars';
 import {createProductsTable, createMessagesTable, KnexConfiguration} from './utils.js';
 import {mySqlDatabase, sqlLite3Database} from './config/configuration.js';
+import { faker } from '@faker-js/faker';
+import {normalize, denormalize, schema} from 'normalizr';
+faker.locale = 'es';
 
 
 
-// const tempContainer = new Container("products.txt");
+// const tempContainer = new Container("messages.txt");
 // const random = require('random');
 const app = express();
 const { Router } = express;
@@ -20,7 +23,7 @@ const io = new Server(httpServer);
 const container = new Container('messages.txt');
 
 app.use('/api/products', routerProducts);
-app.use(express.static('public'))
+app.use( express.static('public'))
 
 routerProducts.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -40,10 +43,10 @@ app.set('view engine', 'hbs');
 
 const port = 8080;
 
-createProductsTable();
-createMessagesTable();
-const productsDbUtils = new KnexConfiguration(mySqlDatabase, 'products');
-const messagesDbUtils = new KnexConfiguration(sqlLite3Database, 'messages');
+// createProductsTable();
+// createMessagesTable();
+// const productsDbUtils = new KnexConfiguration(mySqlDatabase, 'products');
+// const messagesDbUtils = new KnexConfiguration(sqlLite3Database, 'messages');
 
 let mess = [];
 let prods = [];
@@ -52,29 +55,35 @@ let prods = [];
 //WEBSOCKET
 io.on('connection', function(socket) {
   console.log('client conected');
-
-  messagesDbUtils.getAll().then((messages)=>{
-    mess = messages;
-    socket.emit('messages', mess);
-  }).catch(error => console.log(error));
-
-  productsDbUtils.getAll().then((products)=> {
-    prods = products;
-    socket.emit('products', prods); 
-  }).catch(error => console.log(error));
+  socket.emit('messages', mess);
+  // messagesDbUtils.getAll().then((messages)=>{
+  //   mess = messages;
+  //   socket.emit('messages', mess);
+  // }).catch(error => console.log(error));
+  socket.emit('products', prods);
+  // productsDbUtils.getAll().then((products)=> {
+  //   prods = products;
+  //
+  // }).catch(error => console.log(error));
 
   socket.on('new-product', function(data) {
     const product = new Product(undefined, data.title, data.price, data.thumbnails);
-    productsDbUtils.insertData(product).then(() => {
-       io.sockets.emit('products', prods); 
-    }).catch(error => console.log(error));
+    io.sockets.emit('products', prods);
+    // productsDbUtils.insertData(product).then(() => {
+    //    io.sockets.emit('products', prods);
+    // }).catch(error => console.log(error));
   });    
 
   socket.on('new-message', function(data) {
-    const message = new Message(data.email, data.dateTime, data.text)
-    messagesDbUtils.insertData(message).then(()=>{
-      io.sockets.emit('messages', mess);
-    }).catch(error => console.log(error));
+    const message = new Message(data.text, data.author);
+    container.saveNew(message).then(()=>{
+      container.getAll().then(info => {
+        io.sockets.emit('messages', normalizeData(info));
+      })
+    });
+    // messagesDbUtils.insertData(message).then(()=>{
+    //   io.sockets.emit('messages', mess);
+    // }).catch(error => console.log(error));
   }); 
 });
 
@@ -96,6 +105,27 @@ app.post('/products', (req, res) => {
   res.redirect('/')
 });
 
+
+//FAKE
+app.get('/products-test', (req, res) => {
+  const products = createFakesProducts(CANT_PRODUCTS_DEFAULT);
+
+  res.render("view", {products: products});
+});
+
+const CANT_PRODUCTS_DEFAULT = 5;
+
+function createFakeProduct(id) {
+  return new Product(id, faker.commerce.productName(), faker.finance.amount(), faker.image.image());
+}
+
+function createFakesProducts(cant) {
+  const products = []
+  for (let i = 0; i < cant; i++) {
+    products.push(createFakeProduct(getId(products)))
+  }
+  return products
+}
 
 
 //API REST
@@ -141,22 +171,40 @@ routerProducts.put('/:id', async (req, res) => {
   return res.json(newProduct);
 })
 
-routerProducts.delete('/:id', async (req, res) => {
-  const product = products.find(x => x.id === parseInt(req.params.id));
+// routerProducts.delete('/:id', async (req, res) => {
+//   const product = products.find(x => x.id === parseInt(req.params.id));
+//
+//   if(product) {
+//     products = products.filter(x => x.id !== product.id);
+//
+//     return res.json(product);
+//   }
+//
+//   return res.json({error: "404 product not found for delete"});
+// })
 
-  if(product) {
-    products = products.filter(x => x.id !== product.id);
-
-    return res.json(product);
-  }
-
-  return res.json({error: "404 product not found for delete"});
-})
-
-function getId() {
+function getId(products) {
   const ids = products.map((product) => product.id);
 
-  return ids.length > 0 ? Math.max(...ids) : 0;
+  return ids.length > 0 ? Math.max(...ids) : 1;
+}
+
+
+//NORMALIZER
+
+const authorSchema = new schema.Entity('authors', {}, {idAttribute: 'email'});
+const messageSchema = new schema.Entity('messages', {
+  author: authorSchema
+});
+
+const messagesSchema = new schema.Entity('articles', {
+  author: user,
+  comments: [comment],
+});
+
+
+function normalizeData(data){
+  return normalize(data, messageSchema);
 }
 
 httpServer.listen(port, () => {
