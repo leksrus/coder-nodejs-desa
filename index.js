@@ -9,6 +9,8 @@ import {createProductsTable, createMessagesTable, KnexConfiguration} from './uti
 import {mySqlDatabase, sqlLite3Database} from './config/configuration.js';
 import { faker } from '@faker-js/faker';
 import {normalize, denormalize, schema} from 'normalizr';
+import session from 'express-session';
+import MongoStore from 'connect-mongo';
 faker.locale = 'es';
 
 
@@ -27,6 +29,17 @@ app.use( express.static('public'))
 
 routerProducts.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(session({
+  store: MongoStore.create({ mongoUrl: 'mongodb+srv://test:NMZQbTCltcIhpUa3@cluster0.zxw9v.mongodb.net/sessions?retryWrites=true&w=majority' }),
+  /* ----------------------------------------------------- */
+
+  secret: 'mysecret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 10
+  }
+}))
 
 app.engine(
   "hbs",
@@ -88,6 +101,34 @@ io.on('connection', function(socket) {
 });
 
 
+//LOGIN
+app.get('/login', (req, res) => {
+
+  res.render("view", {
+    isLogged: !!req.session.username,
+    isLogout: false,
+    username: req.session.username
+  });
+});
+
+app.post('/login', (req, res) => {
+
+  req.session.username = req.body.username;
+
+  res.redirect('/login')
+});
+
+app.post('/logout', (req, res) => {
+
+  const username = req.session.username;
+  req.session.username = undefined;
+
+  res.render("view", {
+    isLogged: false,
+    username: username,
+    isLogout: true
+  });
+});
 
 
 //TEMPLATES
@@ -98,7 +139,6 @@ app.get('/products', (req, res) => {
 
 app.post('/products', (req, res) => {
   const id = getId();
-  console.log(req.body);
   const product = new Product(id + 1, req.body.title, req.body.price, req.body.thumbnails);
 
   products.push(product);
@@ -197,10 +237,10 @@ const messageSchema = new schema.Entity('messages', {
   author: authorSchema
 });
 
-const messagesSchema = new schema.Entity('articles', {
-  author: user,
-  comments: [comment],
-});
+// const messagesSchema = new schema.Entity('articles', {
+//   author: user,
+//   comments: [comment],
+// });
 
 
 function normalizeData(data){
